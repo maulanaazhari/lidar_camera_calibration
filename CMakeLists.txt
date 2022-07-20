@@ -13,6 +13,13 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  cv_bridge
+  pcl_conversions
+  pcl_ros
+  tf2
+  tf2_ros
+  tf2_msgs
+  tf2_sensor_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -105,9 +112,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES lidar_camera_calibration
-#  CATKIN_DEPENDS image_proc image_view roscpp rospy std_msgs
+ INCLUDE_DIRS include
+ LIBRARIES lidar_camera_calibration
+ CATKIN_DEPENDS image_proc image_view roscpp rospy std_msgs pcl_ros pcl_conversions cv_bridge
 #  DEPENDS system_lib
 )
 
@@ -118,8 +125,8 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
+  include
+  ${catkin_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include
 )
 
 ## Declare a C++ library
@@ -136,6 +143,9 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/lidar_camera_calibration_node.cpp)
+add_executable(lidar_visualizer src/lidar_visualizer.cpp)
+target_link_libraries(lidar_visualizer ${catkin_LIBRARIES})
+# add_dependencies(lidar_visualizer lidar_camera_calibration)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
