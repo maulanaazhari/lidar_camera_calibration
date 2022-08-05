@@ -1,10 +1,13 @@
-#ifndef _LIDAR_VISUALIZER_H_
-#define _LIDAR_VISUALIZER_H_
+#ifndef _LIDAR_CAMERA_DETECTION_H_
+#define _LIDAR_CAMERA_DETECTION_H_
 
 #include <iostream>
 #include <ros/console.h>
 #include <ros/ros.h>
 #include <math.h>
+#include <vector>
+#include <Eigen/Eigen>
+#include <string>
 
 // #include <opencv.h>
 #include <message_filters/subscriber.h>
@@ -16,10 +19,19 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/TransformStamped.h>
+#include <geometry_msgs/Vector3.h>
 #include <image_geometry/pinhole_camera_model.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <vision_msgs/Detection3DArray.h>
+#include <vision_msgs/Detection3D.h>
+#include <vision_msgs/Detection2D.h>
+#include <vision_msgs/ObjectHypothesisWithPose.h>
+#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/MarkerArray.h>
+
+
 
 #include "pcl_ros/point_cloud.h"
 #include <pcl_ros/transforms.h>
@@ -30,13 +42,15 @@
 #include <tf_conversions/tf_eigen.h>
 #include <tf2_ros/buffer.h>
 #include <tf2/convert.h>
+#include <tf2_eigen/tf2_eigen.h>
 #include <tf2/transform_datatypes.h>
 #include <tf2_sensor_msgs/tf2_sensor_msgs.h>
+#include <tf/tf.h>
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-class LidarVisualizer{
+class LidarCameraDetection{
     private:
     // PARAMETERS DEFINITION
     std::string camera_topic, cloud_topic, info_topic, camera_frame, cloud_frame, cloud_out_topic, image_out_topic;
@@ -47,20 +61,22 @@ class LidarVisualizer{
     cv::Matx34d projection_matrix;
 
     tf::TransformListener tf_listener;
-    geometry_msgs::TransformStamped transform;
+    geometry_msgs::TransformStamped transform, inverse_transform;
 
     tf2_ros::Buffer tf_buffer_;
     tf2_ros::TransformListener tf_listener_;
 
-    ros::Publisher cloud_pub, image_pub;
+    ros::Publisher cloud_pub, image_pub, detection_pub, detection_vis_pub;
     ros::Subscriber cam_info_subscriber;
+
+    ros::ServiceClient detection_client;
 
     public:
     
-    LidarVisualizer() : tf_listener_(tf_buffer_){
+    LidarCameraDetection() : tf_listener_(tf_buffer_){
 
     }
-    ~LidarVisualizer(){
+    ~LidarCameraDetection(){
 
     }
 
@@ -74,6 +90,8 @@ class LidarVisualizer{
     void camera_info_callback(
         const sensor_msgs::CameraInfoConstPtr& cam_info_msg
     );
+
+    void visualize_detection(vision_msgs::Detection3DArray);
 
     std::shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> image_sub_;
     std::shared_ptr<message_filters::Subscriber<sensor_msgs::PointCloud2>> cloud_sub_;

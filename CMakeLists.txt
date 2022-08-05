@@ -20,6 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_ros
   tf2_msgs
   tf2_sensor_msgs
+  pycoral_ros
 )
 
 ## System dependencies are found with CMake's conventions
@@ -147,6 +148,11 @@ add_executable(lidar_visualizer src/lidar_visualizer.cpp)
 target_link_libraries(lidar_visualizer ${catkin_LIBRARIES})
 # add_dependencies(lidar_visualizer lidar_camera_calibration)
 
+add_executable(lidar_clustering src/lidar_clustering.cpp)
+target_link_libraries(lidar_clustering ${catkin_LIBRARIES})
+
+add_executable(lidar_camera_detection src/lidar_camera_detection.cpp)
+target_link_libraries(lidar_camera_detection ${catkin_LIBRARIES})
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
